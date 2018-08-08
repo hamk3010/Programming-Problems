@@ -5,6 +5,7 @@ public class basicGraph {
 
 	private ArrayList<Node> nodes = new ArrayList<Node>();
 	private HashMap<String, Node> map = new HashMap<String, Node>();
+	int nEdges =0;
 	
 	
 	public Node getOrCreateNode(String name){
@@ -20,6 +21,7 @@ public class basicGraph {
 		Node start = getOrCreateNode(startName);
 		Node end = getOrCreateNode(endName);
 		start.addNeighbor(end);
+		nEdges++;
 	}
 	
 	public ArrayList<Node> getNodes(){return nodes;}
