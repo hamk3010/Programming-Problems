@@ -1,8 +1,11 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Stack;
 
 
 public abstract class dfs {
+	
+	enum edgeClass{TREE, BACK, FORWARD, CROSS, UNCLASSIFIED};
 	
 	HashMap<Node, Integer> entry_time = new HashMap<>();
 	HashMap<Node, Integer> exit_time = new HashMap<>();
@@ -11,6 +14,7 @@ public abstract class dfs {
 	boolean finished = false;
 	ArrayList<Node> children;
 	basicGraph graph;
+	Stack<Node> myStack= myStack = new Stack<Node>(); //for topological sort
 	
 	public dfs(basicGraph g){
 		this.graph = g;
@@ -23,7 +27,6 @@ public abstract class dfs {
 			return;
 		
 		ArrayList<Node> neighbors;
-//		HashMap<Node, Boolean> discovered = new HashMap<>();
 		start.setState(Node.State.Visiting);
 		entry_time.put(start, t.value);
 		
@@ -35,7 +38,7 @@ public abstract class dfs {
 				process_edge(start, neighbor);
 				doDFS(neighbor);
 			}
-			else if(neighbor.getState() != Node.State.Visiting){
+			else if(neighbor.getState() != Node.State.Unvisited){
 				process_edge(start, neighbor);
 			}
 			if(finished)
@@ -51,9 +54,25 @@ public abstract class dfs {
 	public abstract void process_edge(Node start, Node end);
 	public abstract void process_vertex_late(Node start);
 	
+	public edgeClass edge_classification(Node start, Node end){
+		if(parent.get(end) == start) 
+			return edgeClass.TREE;
+		if(end.getState() ==  Node.State.Visiting)
+			return edgeClass.BACK;
+		if( (end.getState() == Node.State.Visited) && (entry_time.get(end) > entry_time.get(start) ) ){
+			return edgeClass.FORWARD;
+		}
+		if( (end.getState() == Node.State.Visited) && (entry_time.get(end) < entry_time.get(start) ) ){
+			return edgeClass.CROSS;
+		}
+		
+		return edgeClass.UNCLASSIFIED;
+	}
 
 }
 //wrapper class so we avoid using static variables to update time
 class WrapInt{
 	public int value;
 }
+
+
